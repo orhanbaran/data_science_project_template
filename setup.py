@@ -22,6 +22,23 @@ for directory in directories:
         print(f"Error message: {str(e)}")
         break
 
+# Get the project name from the project folder
+project_folder = os.path.basename(os.getcwd())
+
+
+# Generate project structure tree
+def generate_project_structure(directory):
+    tree = ''
+    for item in os.listdir(directory):
+        item_path = os.path.join(directory, item)
+        if os.path.isdir(item_path):
+            tree += f"- {item}/\n"
+            tree += generate_project_structure(item_path)
+        else:
+            tree += f"- {item}\n"
+    return tree
+
+
 # .gitignore, README.md, LICENSE.md contents
 gitignore_content = """
 # Byte-compiled / optimized / DLL files
@@ -179,23 +196,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-readme_content = """MIT License
-Copyright (c) 2023 Orhan Baran
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+readme_content = f"""# {project_folder}
+
+Description: Description will go here
+
+## Project Structure
+
+The structure of the project is as follows:
+
+{generate_project_structure('.')}
 """
 
 try:
@@ -245,7 +254,6 @@ except Exception as e:
 
 print("Setup completed successfully.")
 
-
 # Initialize Git repository
 subprocess.run(['git', 'init'])
 
@@ -261,14 +269,9 @@ subprocess.run(['git', 'add', '.'])
 # Perform initial commit
 subprocess.run(['git', 'commit', '-m', 'Initial commit'])
 
-
-# Get the project name from the project folder
-project_folder = os.path.basename(os.getcwd())
 # Connect to remote GitHub repository
 repository_url = f"git@github.com:orhanbaran/{project_folder}.git"
 subprocess.run(['git', 'remote', 'add', 'origin', repository_url])
 
 # Push to remote GitHub repository
 subprocess.run(['git', 'push', '-u', 'origin', 'version1'])
-
-
